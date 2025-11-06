@@ -85,12 +85,12 @@ export class ClassRateController {
 
             // Access request body
             const body = req.body as Partial<ClassRate>;
-            // if (!body.className || !body.classRate) {
-            //     return res.status(http_status.BadRequest).json({
-            //         status: false,
-            //         message: "Some fields are required.",
-            //     });
-            // }
+            if (!body) {
+                return res.status(http_status.BadRequest).json({
+                    status: false,
+                    message: "Some fields are required.",
+                });
+            }
 
             // Call service to update
             const updated = await this.classRateService.update(classId, body);
@@ -100,6 +100,31 @@ export class ClassRateController {
                 message: "Class Rate Updated Successfully",
                 updated,
             });
+        } catch (error) {
+            console.error(error);
+            return res.status(http_status.InternalServerError).json({
+                status: false,
+                message: "Something went wrong",
+                error: error instanceof Error ? error.message : error,
+            });
+        }
+    }
+    async deleteClass(req: any, res: Response) {
+        try {
+            // Access 'cid' from query and convert to number
+            const { id } = req.query as { id?: string };
+
+            const result = await this.classRateService.remove(Number(id));
+            if (!result) {
+                return res.status(http_status.BadRequest).json({
+                    status: false,
+                    message: "Class cannot delete"
+                })
+            }
+            return res.status(http_status.Success).json({
+                status: true,
+                message: "Class deletion successful"
+            })
         } catch (error) {
             console.error(error);
             return res.status(http_status.InternalServerError).json({

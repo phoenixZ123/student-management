@@ -16,7 +16,6 @@ export class ClassRateService {
         const newClass = this.classRateRepository.create(data);
         return await this.classRateRepository.save(newClass);
     }
-
     // ✅ Get all classes
     async findAll(): Promise<ClassRate[]> {
         const classes = await this.classRateRepository
@@ -26,7 +25,6 @@ export class ClassRateService {
 
         return classes;
     }
-
     // ✅ Get one class by ID
     async findOne(id: number): Promise<ClassRate> {
         const classRate = await this.classRateRepository.findOne({
@@ -36,7 +34,6 @@ export class ClassRateService {
         if (!classRate) throw new error("Class not found");
         return classRate;
     }
-
     // ✅ Update class by ID
     async update(id: number, data: Partial<ClassRate>): Promise<ClassRate> {
         // Find the existing classRate
@@ -51,12 +48,16 @@ export class ClassRateService {
         // Save the updated entity
         return await this.classRateRepository.save(classRate);
     }
-
     // ✅ Delete class by ID
-    async remove(id: number): Promise<void> {
+    async remove(id: number): Promise<any> {
         const result = await this.classRateRepository.delete(id);
         if (result.affected === 0) {
             throw new error("Class not found");
-        }
+        }  
+        if(result){
+            return true;
+        }else{
+            return false;
+        }     
     }
 }
