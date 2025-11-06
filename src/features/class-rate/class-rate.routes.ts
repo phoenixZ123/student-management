@@ -7,4 +7,5 @@ const classRateService = new ClassRateService();
 const classController = new ClassRateController(classRateService);
 
 router.post("/add-class",classController.createClassRate.bind(classController));
+router.get("/all-class",classController.all_class.bind(classController));
 export default router;

@@ -19,7 +19,12 @@ export class ClassRateService {
 
     // ✅ Get all classes
     async findAll(): Promise<ClassRate[]> {
-        return await this.classRateRepository.find({ relations: ["students"] });
+        const classes = await this.classRateRepository
+            .createQueryBuilder("classRate")
+            .leftJoinAndSelect("classRate.students", "student")
+            .getMany();
+
+        return classes;
     }
 
     // ✅ Get one class by ID
