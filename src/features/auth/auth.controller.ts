@@ -19,7 +19,7 @@ export class AuthController {
     async loginUser(req: Request, res: Response) {
         try {
             const body = req.body as Partial<LoginUser>;
-            console.log("user :",body);
+            console.log("user :", body);
             // Runtime validation
             const email = body.email?.trim();
             const password = body.password?.trim();
@@ -31,15 +31,23 @@ export class AuthController {
             // Now we know email and password exist
             const loginData: LoginUser = { email, password };
 
-            // Call your service with a fully typed object
-            const data = await this.authService.loginUser(loginData);
+            if (email == "admin123@gmail.com" && password == "admin123") {
+                // Call your service with a fully typed object
+                const data = await this.authService.loginUser(loginData);
+                res.status(http_status.Success).json({
+                    status: true,
+                    message: 'User logged in successfully',
+                    data: data.data,
+                    token: data.token
+                });
+            }else{
+                  res.status(http_status.Conflict).json({
+                    status: false,
+                    message: 'You are not admin!',
+                });
+            }
 
-            res.status(http_status.Success).json({
-                status: true,
-                message: 'User logged in successfully',
-                data:data.data,
-                token:data.token
-            });
+
         } catch (error: any) {
             console.error('Login error:', error);
             res.status(http_status.InternalServerError).json({

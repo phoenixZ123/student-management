@@ -36,7 +36,7 @@ export class AuthService implements IAuthInterface {
           return { status: false, message: "Invalid password" };
         }
         await AppDataSource.getRepository(User).update({ email: loginUser.email }, { is_active: true })
-        return {  data:exist, token: this.generateToken(exist) };
+        return { data: exist, token: this.generateToken(exist) };
       }
       // Create new user
       const hashedPassword = await bcrypt.hash(loginUser.password, 10);
@@ -45,7 +45,7 @@ export class AuthService implements IAuthInterface {
       const userCreated = await this.userRepository.save(user);
       newSession = await this.createSession(uuidv4, userCreated.id, userAgent, userIp);
 
-      return { data:userCreated, token: this.generateToken(userCreated) };
+      return { data: userCreated, token: this.generateToken(userCreated) };
     } catch (error) {
       console.error("Login error:", error);
       throw new Error("Login failed");
