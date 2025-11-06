@@ -16,7 +16,7 @@ export class ClassRate {
   @Column("varchar", { length: 100 })
   className!: string;
 
-  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  @Column("float", {  default: 0 })
   classRate!: number;
 
   @OneToMany(() => Student, (student) => student.class_rate)
