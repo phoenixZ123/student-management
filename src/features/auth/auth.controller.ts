@@ -41,7 +41,7 @@ export class AuthController {
                     token: data.token
                 });
             }else{
-                  res.status(http_status.Conflict).json({
+                  res.status(http_status.BadRequest).json({
                     status: false,
                     message: 'You are not admin!',
                 });

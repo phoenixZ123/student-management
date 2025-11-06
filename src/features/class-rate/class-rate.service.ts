@@ -1,11 +1,49 @@
 import { Repository } from "typeorm";
 import { ClassRate } from "./entity/class-rate.entity";
 import { AppDataSource } from "src/config/db.config";
+import { error } from "console";
+import { Injectable } from "@nestjs/common";
+@Injectable()
+export class ClassRateService {
+    private classRateRepository: Repository<ClassRate>;
 
-export class classRateService{
-    private classRateRepository:Repository<ClassRate>;
+    constructor() {
+        this.classRateRepository = AppDataSource.getRepository(ClassRate);
+    }
 
-    constructor(){
-        this.classRateRepository=AppDataSource.getRepository(ClassRate);
+    // ✅ Create new class
+    async create(data: Partial<ClassRate>): Promise<ClassRate> {
+        const newClass = this.classRateRepository.create(data);
+        return await this.classRateRepository.save(newClass);
+    }
+
+    // ✅ Get all classes
+    async findAll(): Promise<ClassRate[]> {
+        return await this.classRateRepository.find({ relations: ["students"] });
+    }
+
+    // ✅ Get one class by ID
+    async findOne(id: number): Promise<ClassRate> {
+        const classRate = await this.classRateRepository.findOne({
+            where: { class_id: id },
+            relations: ["students"],
+        });
+        if (!classRate) throw new error("Class not found");
+        return classRate;
+    }
+
+    // ✅ Update class by ID
+    async update(id: number, data: Partial<ClassRate>): Promise<ClassRate> {
+        const classRate = await this.findOne(id);
+        Object.assign(classRate, data);
+        return await this.classRateRepository.save(classRate);
+    }
+
+    // ✅ Delete class by ID
+    async remove(id: number): Promise<void> {
+        const result = await this.classRateRepository.delete(id);
+        if (result.affected === 0) {
+            throw new error("Class not found");
+        }
     }
 }
