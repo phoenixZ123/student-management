@@ -39,8 +39,16 @@ export class ClassRateService {
 
     // ✅ Update class by ID
     async update(id: number, data: Partial<ClassRate>): Promise<ClassRate> {
-        const classRate = await this.findOne(id);
+        // Find the existing classRate
+        const classRate = await this.classRateRepository.findOne({ where: { class_id: id } });
+        if (!classRate) {
+            throw new Error('ClassRate not found');
+        }
+
+        // Merge the new data into the existing entity
         Object.assign(classRate, data);
+
+        // Save the updated entity
         return await this.classRateRepository.save(classRate);
     }
 
