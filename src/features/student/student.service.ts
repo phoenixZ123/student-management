@@ -3,6 +3,7 @@ import { IStudentInterface } from "./interface/student.interface";
 import { Student } from "./entity/student.entity";
 import { AppDataSource } from "src/config/db.config";
 import { StudentObj } from "./type/student.type";
+import { error } from "console";
 
 export class StudentService implements IStudentInterface {
     private studentRepository: Repository<Student>;
@@ -17,7 +18,7 @@ export class StudentService implements IStudentInterface {
             if (!stu.name || !stu.phone || !stu.address || !stu.section) {
                 throw new Error("Missing required fields in service");
             }
-            stu.class_id=Number(stu.class_id);
+            stu.class_id = Number(stu.class_id);
             const create = this.studentRepository.create(stu);
             return await this.studentRepository.save(create);
         } catch (error) {
@@ -25,5 +26,45 @@ export class StudentService implements IStudentInterface {
             throw error;
         }
     }
+    async getAllStudent(): Promise<any> {
+        try {
+            return await this.studentRepository.find({ relations: ['class_rate'] });
+        } catch (error) {
+            console.error("Error get students:", error);
+            throw error;
+        }
+    }
+    async deleteStudent(id: number) {
+        try {
+            const result = await this.studentRepository.delete({ student_id: Number(id) });
+            if (result.affected === 0) {
+                throw new error("Class not found");
+            }
+            if (result) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.error("Error delete student:", error);
+            throw error;
+        }
 
+    }
+    async updateStudent(id: number, data: Partial<Student>) {
+        try {
+            const student = await this.studentRepository.findOneBy({ student_id: id });
+            if (!student) {
+                throw new Error('Student not found');
+            }
+            Object.assign(student, data);
+
+            // Save the updated entity
+            return await this.studentRepository.save(student);
+        } catch (error) {
+            console.error("Error update students:", error);
+            throw error;
+        }
+
+    }
 }

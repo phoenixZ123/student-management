@@ -7,4 +7,7 @@ const router = Router();
 const studentService = new StudentService();
 const studentController = new StudentController(studentService);
 router.post("/add-student", authenticate, studentController.addStudent.bind(studentController));
+router.get("/all-student",studentController.AllStudent.bind(studentController));
+router.delete("/delete-student",studentController.deleteStudent.bind(studentController));
+router.put("/update-student",studentController.updateStudent.bind(studentController));
 export default router;
