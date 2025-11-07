@@ -134,4 +134,22 @@ export class StudentController {
             });
         }
     }
+    async getGradeByStu(req: Request, res: Response) {
+        try {
+            const { gid } = req.query as { gid?: string };
+            const data = await this.studentService.gradeByStudent(Number(gid));
+            return res.status(http_status.Success).json({
+                status: true,
+                message: "Get Grade By Students",
+                data
+            })
+        } catch (error) {
+            console.error(error);
+            return res.status(http_status.InternalServerError).json({
+                status: false,
+                message: "Something went wrong",
+                error: error instanceof Error ? error.message : error,
+            });
+        }
+    }
 }

@@ -34,6 +34,43 @@ export class StudentService implements IStudentInterface {
             throw error;
         }
     }
+    async gradeByStudent(class_id: number): Promise<any> {
+        try {
+            const studentsRaw = await this.studentRepository
+                .createQueryBuilder("student")
+                .leftJoin("student.class_rate", "class_rate")
+                .select([
+                    "student.student_id",
+                    "student.name",
+                    "student.phone",
+                    "student.address",
+                    "student.section",
+                    "student.status",        // include status
+                    "class_rate.className"
+                ])
+                .where("class_rate.class_id = :class_id", { class_id })
+                .getRawMany();
+
+            // Map to clean object
+            const students = studentsRaw.map(s => ({
+                id: s.student_student_id,
+                name: s.student_name,
+                phone: s.student_phone,
+                address: s.student_address,
+                section: s.student_section,
+                status: s.student_status,     // student status included
+                className: s.class_rate_className // className directly
+            }));
+
+            console.log(students);
+
+
+            return students;
+        } catch (error) {
+            console.error("Error get grade by students:", error);
+            throw error;
+        }
+    }
     async deleteStudent(id: number) {
         try {
             const result = await this.studentRepository.delete({ student_id: Number(id) });
