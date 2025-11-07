@@ -32,7 +32,7 @@ export class ReportCardController {
                 "year",
                 "myanmar",
                 "english",
-                "mathematics",
+                "math",
                 "chemistry",
                 "physics",
                 "student_id",
@@ -48,6 +48,7 @@ export class ReportCardController {
             }
 
             // ✅ Call the service to create the record
+            
             const reportCard = await this.reportCardService.createReportCard(data);
 
             return res.status(http_status.Success).json({

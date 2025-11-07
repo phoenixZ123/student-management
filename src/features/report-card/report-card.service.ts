@@ -33,7 +33,7 @@ export class ReportCardService {
                 throw new Error("Student not found");
             }
 
-            const total = data.myanmar + data.english + data.mathematics + data.chemistry + data.physics + (data.bio ?? 0) +
+            const total = data.myanmar + data.english + data.math + data.chemistry + data.physics + (data.bio ?? 0) +
                 (data.eco ?? 0);
             data.total = total;
             // Create report card entity and assign student

@@ -4,7 +4,7 @@ export type ReportCardData={
     date:string;
     myanmar:number;
     english:number;
-    mathematics:number;
+    math:number;
     chemistry:number;
     physics:number;
     bio?:number;
