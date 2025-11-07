@@ -19,9 +19,13 @@ export const setupJwtStrategy = (passport: PassportStatic) => {
           const userRepo = AppDataSource.getRepository(User);
           const user = await userRepo.findOne({ where: { id: payload.id } });
 
-          if (!user) return done(null, false);
-          return done(null, payload);
+          if (!user) {
+            return done(null, false); // ❌ no user found = Unauthorized
+          }
+
+          return done(null, user); // ✅ attach full user entity to req.user
         } catch (err) {
+          console.error("JWT Strategy Error:", err);
           return done(err, false);
         }
       }
@@ -30,4 +34,3 @@ export const setupJwtStrategy = (passport: PassportStatic) => {
 
   console.log('✅ JWT strategy registered');
 };
-

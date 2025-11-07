@@ -91,7 +91,6 @@ export class ClassRateController {
                     message: "Some fields are required.",
                 });
             }
-
             // Call service to update
             const updated = await this.classRateService.update(classId, body);
 

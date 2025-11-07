@@ -43,13 +43,15 @@ export class Student {
     @OneToMany(() => ReportCard, (reportCard) => reportCard.student)
     reportCards?: ReportCard[];
 
-    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    @Column({
+        type: 'timestamptz',            // store timezone-aware timestamp
+        default: () => 'CURRENT_TIMESTAMP'
+    })
     created_at!: Date;
 
-    @UpdateDateColumn({
-        type: "timestamp",
-        default: () => "CURRENT_TIMESTAMP",
-        onUpdate: "CURRENT_TIMESTAMP",
+    @Column({
+        type: 'timestamptz',            // store timezone-aware timestamp
+        default: () => 'CURRENT_TIMESTAMP'
     })
     updated_at!: Date;
 }

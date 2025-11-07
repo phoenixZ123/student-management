@@ -25,9 +25,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
 }));
-
-app.use(passport.initialize());
 app.use(passport.session());
+app.use(passport.initialize());
 setupJwtStrategy(passport);
 
 app.use("/api/auth", userRouter);

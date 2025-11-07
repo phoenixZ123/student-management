@@ -2,6 +2,7 @@ import { Repository } from "typeorm";
 import { IStudentInterface } from "./interface/student.interface";
 import { Student } from "./entity/student.entity";
 import { AppDataSource } from "src/config/db.config";
+import { StudentObj } from "./type/student.type";
 
 export class StudentService implements IStudentInterface {
     private studentRepository: Repository<Student>;
@@ -9,4 +10,20 @@ export class StudentService implements IStudentInterface {
     constructor() {
         this.studentRepository = AppDataSource.getRepository(Student);
     }
+
+    // ✅ Accept Partial<StudentObj> so TypeScript doesn’t complain
+    async addStudent(stu: Partial<StudentObj>): Promise<Student> {
+        try {
+            if (!stu.name || !stu.phone || !stu.address || !stu.section) {
+                throw new Error("Missing required fields in service");
+            }
+            stu.class_id=Number(stu.class_id);
+            const create = this.studentRepository.create(stu);
+            return await this.studentRepository.save(create);
+        } catch (error) {
+            console.error("Error adding student:", error);
+            throw error;
+        }
+    }
+
 }

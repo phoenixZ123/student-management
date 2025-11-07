@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { uuid } from "uuidv4";
 import { Injectable } from "@nestjs/common";
+import { AppConfig } from "src/config/app.config";
 @Injectable()
 export class AuthService implements IAuthInterface {
   private userRepository: Repository<User>;
@@ -52,14 +53,18 @@ export class AuthService implements IAuthInterface {
     }
 
   }
-  private generateToken(user: User) {
-    const payload = { id: user.id, email: user.email };
-    const token = jwt.sign(payload, process.env.JWT_SECRET!, {
-      expiresIn: '1d',
-    });
+  private generateToken = (user: User) => {
+  const secret = AppConfig.secrets.jwtSecret || "your_jwt_secret";
 
-    return { access_token: token };
-  }
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+    },
+    secret,
+    { expiresIn: "1d" }
+  );
+};
   async createSession(
     session: string,
     userId: number,
