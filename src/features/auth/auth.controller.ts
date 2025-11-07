@@ -1,62 +1,42 @@
-import { http_status } from "src/shared/constants/http_status";
-import { AuthService } from "./auth.service";
-import { loginUser } from "./dtos/user.dto";
+import { Controller } from "@nestjs/common";
 import { Request, Response } from "express";
-import { Controller, Post } from "@nestjs/common";
+import { AuthService } from "./auth.service";
+import { http_status } from "src/shared/constants/http_status";
+
 interface LoginUser {
     email: string;
     password: string;
 }
-@Controller('auth')
+
+@Controller("auth")
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
-    /**
-    * Handle successful login
-    * @param req - The request object
-    * @param res - The response object
-    */
     async loginUser(req: Request, res: Response) {
         try {
-            const body = req.body as Partial<LoginUser>;
-            console.log("user :", body);
-            // Runtime validation
-            const email = body.email?.trim();
-            const password = body.password?.trim();
+            const { email, password } = req.body as Partial<LoginUser>;
 
             if (!email || !password) {
-                return res.status(http_status.BadRequest).json({ message: 'All Fields are required' });
-            }
-
-            // Now we know email and password exist
-            const loginData: LoginUser = { email, password };
-
-            if (email == "admin123@gmail.com" && password == "admin123") {
-                // Call your service with a fully typed object
-                const data = await this.authService.loginUser(loginData);
-                res.status(http_status.Success).json({
-                    status: true,
-                    message: 'User logged in successfully',
-                    data: data.data,
-                    token: data.token
-                });
-            }else{
-                  res.status(http_status.BadRequest).json({
+                return res.status(http_status.BadRequest).json({
                     status: false,
-                    message: 'You are not admin!',
+                    message: "All fields are required",
                 });
             }
 
+            const data = await this.authService.loginUser({ email, password });
 
+            return res.status(http_status.Success).json({
+                status: true,
+                message: "User logged in successfully",
+                data, // ✅ token is included in data
+            });
         } catch (error: any) {
-            console.error('Login error:', error);
-            res.status(http_status.InternalServerError).json({
+            console.error("Login error:", error);
+            return res.status(http_status.InternalServerError).json({
                 status: false,
-                message: 'Login failed',
+                message: "Login failed",
                 error: error.message || error,
             });
         }
-
     }
-
 }

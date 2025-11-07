@@ -49,9 +49,7 @@ export class Student {
     })
     created_at!: Date;
 
-    @Column({
-        type: 'timestamptz',            // store timezone-aware timestamp
-        default: () => 'CURRENT_TIMESTAMP'
-    })
-    updated_at!: Date;
+    @Column({ type: 'timestamptz', default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
+    updated_at!: Date
+
 }
