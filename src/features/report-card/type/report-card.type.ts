@@ -1,6 +1,7 @@
 export type ReportCardData={
-    month:string;
-    year:number;
+    month?:string;
+    year?:number;
+    date:string;
     myanmar:number;
     english:number;
     mathematics:number;

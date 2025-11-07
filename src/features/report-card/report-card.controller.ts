@@ -8,29 +8,53 @@ export class ReportCardController {
 
     async createReportCard(req: Request, res: Response) {
         try {
-            // ✅ Type assertion
             const data = req.body as ReportCardData;
 
-            // Optional: validate required fields
-            const requiredFields = ["month", "year", "myanmar", "english", "mathematics", "chemistry", "physics", "student_id"];
+            // ✅ Extract month and year from frontend date
+            if (!data.date) {
+                return res.status(http_status.BadRequest).json({
+                    status: false,
+                    message: "Missing date field",
+                });
+            }
+
+            const date = new Date(data.date);
+            const month = date.toLocaleString("en-US", { month: "long" }); // e.g. "November"
+            const year = date.getFullYear(); // e.g. 2025
+
+            // ✅ Assign derived fields before validation
+            data.month = month;
+            data.year = year;
+
+            // ✅ Validate required fields
+            const requiredFields = [
+                "month",
+                "year",
+                "myanmar",
+                "english",
+                "mathematics",
+                "chemistry",
+                "physics",
+                "student_id",
+            ];
+
             for (const field of requiredFields) {
                 if (data[field as keyof ReportCardData] === undefined) {
                     return res.status(http_status.BadRequest).json({
                         status: false,
-                        message: `Missing required field: ${field}`
+                        message: `Missing required field: ${field}`,
                     });
                 }
             }
 
-            // Call service
+            // ✅ Call the service to create the record
             const reportCard = await this.reportCardService.createReportCard(data);
 
             return res.status(http_status.Success).json({
                 status: true,
                 message: "Report card created successfully",
-                data: reportCard
+                data: reportCard,
             });
-
         } catch (error) {
             console.error("Error creating report card:", error);
             return res.status(http_status.InternalServerError).json({
@@ -40,6 +64,7 @@ export class ReportCardController {
             });
         }
     }
+
     async getStudentReport(req: Request, res: Response) {
         try {
             const { id } = req.query as { id?: string };
