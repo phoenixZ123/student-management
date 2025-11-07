@@ -10,28 +10,28 @@ import {
 
 @Entity("class_rate")
 export class ClassRate {
- @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn()
   class_id!: number;
 
   @Column("varchar", { length: 100 })
   className!: string;
 
-  @Column("float", {  default: 0 })
+  @Column("float", { default: 0 })
   classRate!: number;
 
   @OneToMany(() => Student, (student) => student.class_rate)
   students?: Student[];
 
-  @CreateDateColumn({
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP",
+  @Column({
+    type: 'timestamptz', // timezone-aware
+    default: () => "CURRENT_TIMESTAMP"
   })
   created_at!: Date;
 
-  @UpdateDateColumn({
-    type: "timestamp",
+  @Column({
+    type: 'timestamptz',
     default: () => "CURRENT_TIMESTAMP",
-    onUpdate: "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP"
   })
   updated_at!: Date;
 }

@@ -48,13 +48,16 @@ export class ReportCard {
     @Column("int", { default: 0 })
     total!: number;
 
-    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    @Column({
+        type: 'timestamptz', // timezone-aware
+        default: () => "CURRENT_TIMESTAMP"
+    })
     created_at!: Date;
 
-    @UpdateDateColumn({
-        type: "timestamp",
+    @Column({
+        type: 'timestamptz',
         default: () => "CURRENT_TIMESTAMP",
-        onUpdate: "CURRENT_TIMESTAMP",
+        onUpdate: "CURRENT_TIMESTAMP"
     })
     updated_at!: Date;
 }

@@ -1,0 +1,26 @@
+export type ReportCardData={
+    month:string;
+    year:number;
+    myanmar:number;
+    english:number;
+    mathematics:number;
+    chemistry:number;
+    physics:number;
+    bio?:number;
+    eco?:number;
+    total?:number;
+    student_id:number;
+}
+export type updateReportData={
+    month?:string;
+    year?:number;
+    myanmar?:number;
+    english?:number;
+    mathematics?:number;
+    chemistry?:number;
+    physics?:number;
+    bio?:number;
+    eco?:number;
+    total?:number;
+    student_id:number;
+}

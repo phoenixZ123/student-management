@@ -45,7 +45,8 @@ export class StudentService implements IStudentInterface {
                     "student.phone",
                     "student.address",
                     "student.section",
-                    "student.status",        // include status
+                    "student.status",   
+                    "class_rate.class_id",   
                     "class_rate.className"
                 ])
                 .where("class_rate.class_id = :class_id", { class_id })
@@ -59,11 +60,10 @@ export class StudentService implements IStudentInterface {
                 address: s.student_address,
                 section: s.student_section,
                 status: s.student_status,     // student status included
+                class_id:s.class_rate_class_id,
                 className: s.class_rate_className // className directly
             }));
-
             console.log(students);
-
 
             return students;
         } catch (error) {
