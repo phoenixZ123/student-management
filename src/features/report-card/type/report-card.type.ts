@@ -10,7 +10,7 @@ export type ReportCardData={
     bio?:number;
     eco?:number;
     total?:number;
-    student_id:number;
+    student_id:string;
 }
 export type updateReportData={
     month?:string;

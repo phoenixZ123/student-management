@@ -17,7 +17,7 @@ export class ReportCardService {
     async createReportCard(data: ReportCardData): Promise<ReportCard> {
         try {
             const user = await this.reportCardRepository.findOne({
-                where: { student: { student_id: data.student_id } },
+                where: { student: { student_id: Number(data.student_id) } },
                 relations: ["student"], // optional if you want the student data
             });
 
@@ -26,7 +26,7 @@ export class ReportCardService {
             }
             // Find the student first
             const student = await this.studentRepository.findOne({
-                where: { student_id: data.student_id }
+                where: { student_id: Number(data.student_id)}
             });
 
             if (!student) {
