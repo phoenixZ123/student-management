@@ -48,7 +48,7 @@ export class ReportCardController {
             }
 
             // ✅ Call the service to create the record
-            
+
             const reportCard = await this.reportCardService.createReportCard(data);
 
             return res.status(http_status.Success).json({
@@ -112,15 +112,32 @@ export class ReportCardController {
             const { id } = req.query as { id?: string };
             const body = req.body as updateReportData;
 
-            const data = await this.reportCardService.updateReportCard(Number(id), body);
-            if (!data) {
-                throw new Error("Cannot Update To This Report Card")
+            if (!body.date) {
+                throw new Error("Date is required to determine month and year");
             }
+
+            const date = new Date(body.date);
+            if (isNaN(date.getTime())) {
+                throw new Error("Invalid date format");
+            }
+
+            const month = date.toLocaleString("en-US", { month: "long" });
+            const year = date.getFullYear();
+
+            body.month = month;
+            body.year = year;
+
+            const data = await this.reportCardService.updateReportCard(Number(id), body);
+
+            if (!data) {
+                throw new Error("Cannot Update This Report Card");
+            }
+
             return res.status(http_status.Success).json({
                 status: true,
-                message: "Report Card Update Successfully",
-                data
-            })
+                message: "Report Card Updated Successfully",
+                data,
+            });
         } catch (error) {
             console.error("Error update report card:", error);
             return res.status(http_status.InternalServerError).json({
@@ -129,5 +146,6 @@ export class ReportCardController {
                 error: error instanceof Error ? error.message : String(error),
             });
         }
+
     }
 }

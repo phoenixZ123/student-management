@@ -1,63 +1,62 @@
 import { Student } from "src/features/student/entity/student.entity";
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    CreateDateColumn,
-    UpdateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
 } from "typeorm";
 
 @Entity("report_card")
 export class ReportCard {
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @ManyToOne(() => Student, (student) => student.reportCards, {
-        onDelete: "CASCADE",
-    })
-    student?: Student;
+  @ManyToOne(() => Student, (student) => student.reportCards, {
+    onDelete: "CASCADE",
+  })
+  student?: Student;
 
-    @Column("varchar", { length: 20 })
-    month!: string;
+  @Column("varchar", { length: 20 })
+  month!: string;
 
-    @Column("int")
-    year!: number;
+  @Column("int")
+  year!: number;
 
-    @Column("int", { default: 0 })
-    myanmar!: number;
+  // --- Subject Grades ---
+  @Column("varchar", { length: 2, nullable: true })
+  myanmar?: string;
 
-    @Column("int", { default: 0 })
-    english!: number;
+  @Column("varchar", { length: 2, nullable: true })
+  english?: string;
 
-    @Column("int", { default: 0 })
-    mathematics!: number;
+  @Column("varchar", { length: 2, nullable: true })
+  mathematics?: string;
 
-    @Column("int", { nullable: true, default: 0 })
-    chemistry!: number;
+  @Column("varchar", { length: 2, nullable: true })
+  chemistry?: string;
 
-    @Column("int", { nullable: true, default: 0 })
-    physics!: number;
+  @Column("varchar", { length: 2, nullable: true })
+  physics?: string;
 
-    @Column("int", { nullable: true, default: 0 })
-    bio!: number;
+  @Column("varchar", { length: 2, nullable: true })
+  bio?: string;
 
-    @Column("int", { nullable: true, default: 0 })
-    eco!: number;
+  @Column("varchar", { length: 2, nullable: true })
+  eco?: string;
 
-    @Column("int", { default: 0 })
-    total!: number;
+  @Column("int",{default:0})
+  total?:number;
 
-    @Column({
-        type: 'timestamptz', // timezone-aware
-        default: () => "CURRENT_TIMESTAMP"
-    })
-    created_at!: Date;
+  @Column({
+    type: "timestamptz",
+    default: () => "CURRENT_TIMESTAMP",
+  })
+  created_at!: Date;
 
-    @Column({
-        type: 'timestamptz',
-        default: () => "CURRENT_TIMESTAMP",
-        onUpdate: "CURRENT_TIMESTAMP"
-    })
-    updated_at!: Date;
+  @Column({
+    type: "timestamptz",
+    default: () => "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP",
+  })
+  updated_at!: Date;
 }

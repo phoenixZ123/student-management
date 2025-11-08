@@ -13,6 +13,7 @@ export type ReportCardData={
     student_id:string;
 }
 export type updateReportData={
+    date?:string;
     month?:string;
     year?:number;
     myanmar?:number;

@@ -3,6 +3,7 @@ import { ReportCard } from "./entity/report-card.entity";
 import { AppDataSource } from "src/config/db.config";
 import { ReportCardData, updateReportData } from "./type/report-card.type";
 import { Student } from "../student/entity/student.entity";
+import { getGrade, gradeToMark } from "./utils/report.util";
 
 export class ReportCardService {
     private reportCardRepository: Repository<ReportCard>;
@@ -16,40 +17,68 @@ export class ReportCardService {
     // Create a new report card linked to a student
     async createReportCard(data: ReportCardData): Promise<ReportCard> {
         try {
-            const user = await this.reportCardRepository.findOne({
+            // Check if the student already has a report card
+            const existing = await this.reportCardRepository.findOne({
                 where: { student: { student_id: Number(data.student_id) } },
-                relations: ["student"], // optional if you want the student data
+                relations: ["student"],
             });
 
-            if (user?.id) {
+            if (existing?.id) {
                 throw new Error("This student already has a report card.");
             }
-            // Find the student first
-            const student = await this.studentRepository.findOne({
-                where: { student_id: Number(data.student_id)}
-            });
 
+            // Find the student
+            const student = await this.studentRepository.findOne({
+                where: { student_id: Number(data.student_id) }
+            });
             if (!student) {
                 throw new Error("Student not found");
             }
 
-            const total = data.myanmar + data.english + data.math + data.chemistry + data.physics + (data.bio ?? 0) +
+            // --- Calculate total using numeric fallback 0 ---
+            const total =
+                (data.myanmar ?? 0) +
+                (data.english ?? 0) +
+                (data.math ?? 0) +
+                (data.chemistry ?? 0) +
+                (data.physics ?? 0) +
+                (data.bio ?? 0) +
                 (data.eco ?? 0);
-            data.total = total;
-            // Create report card entity and assign student
+
+            // --- Convert marks to grades safely ---
+            const myanmarGrade = getGrade(data.myanmar ?? 0);
+            const englishGrade = getGrade(data.english ?? 0);
+            const mathGrade = getGrade(data.math ?? 0);
+            const chemistryGrade = getGrade(data.chemistry ?? 0);
+            const physicsGrade = getGrade(data.physics ?? 0);
+            const bioGrade = getGrade(data.bio ?? 0);
+            const ecoGrade = getGrade(data.eco ?? 0);
+
+            // --- Create report card entity ---
             const reportCard = this.reportCardRepository.create({
-                ...data,
-                student: student  // link the relation
+                month: data.month,
+                year: data.year,
+                myanmar: myanmarGrade,
+                english: englishGrade,
+                mathematics: mathGrade,
+                chemistry: chemistryGrade,
+                physics: physicsGrade,
+                bio: bioGrade,
+                eco: ecoGrade,
+                total: total,
+                student: student
             });
 
-            // Save to database
+            // --- Save to database ---
             const savedReportCard = await this.reportCardRepository.save(reportCard);
             return savedReportCard;
+
         } catch (error) {
             console.error("Error creating report card:", error);
             throw error;
         }
     }
+
     async getReportCard(student_id: number) {
         try {
             return await this.reportCardRepository.findOne({
@@ -71,20 +100,51 @@ export class ReportCardService {
             throw error;
         }
     }
+    // ✅ Update report card (recalculate total & grades)
     async updateReportCard(card_id: number, data: Partial<updateReportData>): Promise<any> {
         try {
             const report = await this.reportCardRepository.findOneBy({ id: card_id });
-            if (!report) {
-                throw new Error('Report Card not found');
-            }
-            data.total = (data.myanmar ?? report.myanmar) + (data.english ?? report.english) + (data.mathematics ?? report.mathematics) + (data.chemistry ?? report.chemistry) +( data.physics ?? report.physics) + (data.bio ?? 0) +
-                (data.eco ?? 0);
-            Object.assign(report, data);
+            if (!report) throw new Error("Report Card not found");
+
+            // --- Convert existing grades to numeric marks if data missing ---
+            const myanmarMark = data.myanmar ?? gradeToMark(report.myanmar);
+            const englishMark = data.english ?? gradeToMark(report.english);
+            const mathMark = data.mathematics ?? gradeToMark(report.mathematics);
+            const cheMark = data.chemistry ?? gradeToMark(report.chemistry);
+            const phyMark = data.physics ?? gradeToMark(report.physics);
+            const bioMark = data.bio ?? gradeToMark(report.bio);
+            const ecoMark = data.eco ?? gradeToMark(report.eco);
+
+            // --- Recalculate total ---
+            const total = myanmarMark + englishMark + mathMark + cheMark + phyMark + bioMark + ecoMark;
+
+            // --- Convert numeric marks to grades ---
+            const myanmarGrade = getGrade(myanmarMark);
+            const englishGrade = getGrade(englishMark);
+            const mathGrade = getGrade(mathMark);
+            const cheGrade = getGrade(cheMark);
+            const phyGrade = getGrade(phyMark);
+            const bioGrade = getGrade(bioMark);
+            const ecoGrade = getGrade(ecoMark);
+
+            // --- Assign updated values ---
+            report.month = data.month ?? report.month;
+            report.year = data.year ?? report.year;
+            report.myanmar = myanmarGrade;
+            report.english = englishGrade;
+            report.mathematics = mathGrade;
+            report.chemistry = cheGrade;
+            report.physics = phyGrade;
+            report.bio = bioGrade;
+            report.eco = ecoGrade;
+            report.total = total;
 
             return await this.reportCardRepository.save(report);
+
         } catch (error) {
-            console.error("Error update report card:", error);
+            console.error("Error updating report card:", error);
             throw error;
         }
     }
+
 }
