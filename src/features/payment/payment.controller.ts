@@ -57,4 +57,22 @@ export class PaymentController {
             });
         }
     }
+    async getStudentPayment(req: Request, res: Response) {
+        try {
+            const { id } = req.query as { id?: string };
+            const data = await this.paymentService.getStudentPayment(Number(id));
+            return res.status(http_status.Success).json({
+                status:true,
+                message:"Student Payment",
+                data
+            })
+        } catch (error) {
+            console.error("Error get payment:", error);
+            return res.status(http_status.InternalServerError).json({
+                status: false,
+                message: "Failed to get payment",
+                error: error instanceof Error ? error.message : String(error),
+            });
+        }
+    }
 }

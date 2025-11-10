@@ -81,7 +81,7 @@ export class PaymentService implements IPaymentInterface {
         try {
             const studentsInClass = await this.studentRepository.find({
                 where: { class_rate: { class_id: classId } },
-                relations:['class_rate']
+                relations: ['class_rate']
             });
 
             if (!studentsInClass.length) {
@@ -109,8 +109,8 @@ export class PaymentService implements IPaymentInterface {
                 amount: p.amount,
                 credit_amount: p.credit_amount ?? 0,
                 payment_date: p.payment_date,
-                payment_type:p.payment_type,
-                note:p.note,
+                payment_type: p.payment_type,
+                note: p.note,
             }));
 
             return { status: true, message: "Payments retrieved successfully", data: result };
@@ -119,6 +119,39 @@ export class PaymentService implements IPaymentInterface {
             return { status: false, message: "Failed to get class payments", error: error.message };
         }
     }
+    async getStudentPayment(id: number) {
+        try {
+            const payments: any[] = await this.paymentRepository.find({
+                where: { student: { student_id: id } },
+                order: { payment_date: "DESC" }, // latest first
+            });
 
+            if (!payments.length) {
+                throw new Error("Student has no payments yet");
+            }
+
+            const data = payments.map(payment => {
+                // Safely format date
+                const formattedDate = payment.payment_date
+                    ? `${payment.payment_date.getFullYear()}-${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(payment.payment_date)}-${payment.payment_date.getDate().toString().padStart(2, '0')}`
+                    : null;
+
+                return {
+                    amount: payment.amount,
+                    note: payment.note,
+                    credit_amount: payment.credit_amount,
+                    payment_type: payment.payment_type,
+                    date: formattedDate,
+                };
+            });
+
+            return data;
+
+        } catch (error) {
+            console.error("Error fetching payments:", error);
+            throw error;
+        }
+
+    }
 
 }
