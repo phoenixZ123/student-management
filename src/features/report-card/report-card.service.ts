@@ -108,11 +108,11 @@ export class ReportCardService {
                 year: r.year,
                 myanmar: r.myanmar,
                 english: r.english,
-                mathematics: r.mathematics,
+                math: r.mathematics,
                 chemistry: r.chemistry,
                 physics: r.physics,
-                bio: r.bio,
-                eco: r.eco,
+                biology: r.bio,
+                ecology: r.eco,
                 total: r.total,
                 created_at: r.created_at,
                 updated_at: r.updated_at,
@@ -146,8 +146,8 @@ export class ReportCardService {
             const mathMark = data.mathematics ?? report.mathematics;
             const cheMark = data.chemistry ?? report.chemistry;
             const phyMark = data.physics ?? report.physics;
-            const bioMark = data.bio ?? report.bio;
-            const ecoMark = data.eco ?? report.eco;
+            const bioMark = data.biology ?? report.bio;
+            const ecoMark = data.ecology ?? report.eco;
 
             // --- Recalculate total ---
             const total = Number(myanmarMark) + Number(englishMark) + Number(mathMark) + Number(cheMark) + Number(phyMark) + Number(bioMark) + Number(ecoMark);

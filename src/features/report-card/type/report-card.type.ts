@@ -21,8 +21,8 @@ export type updateReportData={
     mathematics?:number;
     chemistry?:number;
     physics?:number;
-    bio?:number;
-    eco?:number;
+    biology?:number;
+    ecology?:number;
     total?:number;
     student_id:number;
 }
