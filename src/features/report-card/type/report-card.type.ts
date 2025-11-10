@@ -7,8 +7,8 @@ export type ReportCardData={
     math:number;
     chemistry:number;
     physics:number;
-    bio?:number;
-    eco?:number;
+    biology?:number;
+    ecology?:number;
     total?:number;
     student_id:string;
 }

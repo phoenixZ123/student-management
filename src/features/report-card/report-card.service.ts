@@ -33,8 +33,8 @@ export class ReportCardService {
                 (data.math ?? 0) +
                 (data.chemistry ?? 0) +
                 (data.physics ?? 0) +
-                (data.bio ?? 0) +
-                (data.eco ?? 0);
+                (data.biology ?? 0) +
+                (data.ecology ?? 0);
 
             // --- Create report card entity ---
             const reportCard = this.reportCardRepository.create({
@@ -45,8 +45,8 @@ export class ReportCardService {
                 mathematics: data.math ?? 0,
                 chemistry: data.chemistry ?? 0,
                 physics: data.physics ?? 0,
-                bio: data.bio ?? 0,
-                eco: data.eco ?? 0,
+                bio: data.biology ?? 0,
+                eco: data.ecology ?? 0,
                 total: total,
                 student: student,
                 created_at: data.date ? new Date(data.date) : new Date(),
@@ -108,8 +108,7 @@ export class ReportCardService {
                 total: r.total,
                 created_at: r.created_at,
                 updated_at: r.updated_at,
-                date: `${r.created_at.getFullYear()}-${(r.created_at.getMonth() + 1)
-                    .toString().padStart(2, '0')}-${r.created_at.getDate().toString().padStart(2, '0')}`
+                date: `${r.created_at.getFullYear()}-${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(r.created_at)}-${r.created_at.getDate().toString().padStart(2, '0')}`
             }));
             console.log("data:",);
             return flattened;
