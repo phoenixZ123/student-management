@@ -50,14 +50,15 @@ export class ClassRateService {
     }
     // ✅ Delete class by ID
     async remove(id: number): Promise<any> {
-        const result = await this.classRateRepository.delete(id);
-        if (result.affected === 0) {
-            throw new error("Class not found");
-        }  
-        if(result){
-            return true;
-        }else{
-            return false;
-        }     
+        try {
+            await this.classRateRepository.delete(id);
+        } catch (error) {
+            console.error("Something went wrong:", error);
+            return {
+                status: false,
+                message: "Something went wrong",
+                error: error instanceof Error ? error.message : String(error),
+            };
+        }
     }
 }

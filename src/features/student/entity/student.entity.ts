@@ -21,7 +21,7 @@ export class Student {
     name!: string;
 
     @ManyToOne(() => ClassRate, (classRate) => classRate.students, {
-        nullable: true,
+        cascade: true,
         onDelete: "SET NULL", // Important: deleting a class sets students.class_rate to null
     })
     @JoinColumn({ name: "class_id" })

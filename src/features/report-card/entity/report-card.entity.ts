@@ -55,10 +55,7 @@ export class ReportCard {
   total?: number;
 
 
-  @Column({
-    type: "timestamptz",
-    default: () => "CURRENT_TIMESTAMP",
-  })
+  @Column({ type: "timestamptz", nullable: true })
   created_at!: Date;
 
   @Column({

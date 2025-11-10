@@ -17,15 +17,6 @@ export class ReportCardService {
     // Create a new report card linked to a student
     async createReportCard(data: ReportCardData): Promise<ReportCard> {
         try {
-            // Check if the student already has a report card
-            const existing = await this.reportCardRepository.findOne({
-                where: { student: { student_id: Number(data.student_id) } },
-                relations: ["student"],
-            });
-
-            if (existing?.id) {
-                throw new Error("This student already has a report card.");
-            }
 
             // Find the student
             const student = await this.studentRepository.findOne({
@@ -57,7 +48,8 @@ export class ReportCardService {
                 bio: data.bio ?? 0,
                 eco: data.eco ?? 0,
                 total: total,
-                student: student
+                student: student,
+                created_at: data.date ? new Date(data.date) : new Date(),
             });
 
             // --- Save to database ---
