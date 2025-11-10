@@ -6,6 +6,7 @@ import {
     OneToMany,
     CreateDateColumn,
     UpdateDateColumn,
+    JoinColumn,
 } from "typeorm";
 import { ClassRate } from "src/features/class-rate/entity/class-rate.entity";
 import { Payment } from "src/features/payment/entity/payment.entity";
@@ -19,11 +20,12 @@ export class Student {
     @Column("varchar", { length: 100 })
     name!: string;
 
-   @ManyToOne(() => ClassRate, (classRate) => classRate.students, {
-    nullable: true,
-    onDelete: "SET NULL", // Important: deleting a class sets students.class_rate to null
-})
-class_rate!: ClassRate | null;
+    @ManyToOne(() => ClassRate, (classRate) => classRate.students, {
+        nullable: true,
+        onDelete: "SET NULL", // Important: deleting a class sets students.class_rate to null
+    })
+    @JoinColumn({ name: "class_id" })
+    class_rate!: ClassRate | null;
 
     @Column("varchar", { length: 15 })
     phone!: string;

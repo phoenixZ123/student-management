@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { Payment } from "./entity/payment.entity";
 import { AppDataSource } from "src/config/db.config";
 import { IPaymentInterface } from "./interface/payment.interface";
@@ -33,13 +33,13 @@ export class PaymentService implements IPaymentInterface {
             }
 
             // Step 2: Fetch latest payment to get last left_amount
-            const lastPayment:any = await this.paymentRepository.findOne({
+            const lastPayment: any = await this.paymentRepository.findOne({
                 where: { student: { student_id: studentId } },
                 order: { created_at: "DESC" },
             });
-             if(amount > lastPayment?.credit_amount){
-                    return false;
-                }
+            if (amount > lastPayment?.credit_amount) {
+                return false;
+            }
 
             const lastLeftAmount = lastPayment?.credit_amount ?? student.class_rate.classRate;
 
@@ -75,6 +75,48 @@ export class PaymentService implements IPaymentInterface {
                 message: "Failed to create payment",
                 error: error instanceof Error ? error.message : String(error),
             };
+        }
+    }
+    async getPaymentsByClass(classId: number) {
+        try {
+            const studentsInClass = await this.studentRepository.find({
+                where: { class_rate: { class_id: classId } },
+                relations:['class_rate']
+            });
+
+            if (!studentsInClass.length) {
+                return { status: false, message: "No students found in this class" };
+            }
+
+            const studentIds = studentsInClass.map((s) => s.student_id);
+
+            const payments = await this.paymentRepository.find({
+                where: { student: { student_id: In(studentIds) } },
+                relations: ["student", "student.class_rate"],
+                order: { payment_date: "DESC" },
+            });
+
+            if (!payments.length) {
+                return { status: false, message: "No payments found for students in this class" };
+            }
+
+            const result = payments.map((p) => ({
+                payment_id: p.id,
+                student_id: p.student?.student_id,
+                student_name: p.student?.name,
+                class_id: p.student?.class_rate?.class_id ?? null,
+                class_name: p.student?.class_rate?.className ?? "No class assigned",
+                amount: p.amount,
+                credit_amount: p.credit_amount ?? 0,
+                payment_date: p.payment_date,
+                payment_type:p.payment_type,
+                note:p.note,
+            }));
+
+            return { status: true, message: "Payments retrieved successfully", data: result };
+        } catch (error: any) {
+            console.error("Error fetching class payments:", error);
+            return { status: false, message: "Failed to get class payments", error: error.message };
         }
     }
 

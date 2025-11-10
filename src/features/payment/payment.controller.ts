@@ -27,7 +27,7 @@ export class PaymentController {
                     message: "Payment cannot create",
                 });
             }
-           
+
 
             return res.status(http_status.Success).json({
                 status: true,
@@ -39,6 +39,20 @@ export class PaymentController {
             return res.status(http_status.InternalServerError).json({
                 status: false,
                 message: "Failed to create payment",
+                error: error instanceof Error ? error.message : String(error),
+            });
+        }
+    }
+    async getPayment(req: Request, res: Response) {
+        try {
+            const { id } = req.query as { id?: string };
+            const data = await this.paymentService.getPaymentsByClass(Number(id));
+            return res.status(http_status.Success).json(data);
+        } catch (error) {
+            console.error("Error get payment:", error);
+            return res.status(http_status.InternalServerError).json({
+                status: false,
+                message: "Failed to get payment",
                 error: error instanceof Error ? error.message : String(error),
             });
         }
