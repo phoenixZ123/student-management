@@ -71,6 +71,7 @@ export class ReportCardController {
             const { id } = req.query as { id?: string };
 
             const data = await this.reportCardService.getReportCard(Number(id));
+            // console.log("report ",data);
             if (data) {
                 return res.status(http_status.Success).json({
                     status: true,

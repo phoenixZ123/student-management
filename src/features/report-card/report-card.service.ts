@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { ReportCard } from "./entity/report-card.entity";
 import { AppDataSource } from "src/config/db.config";
 import { ReportCardData, updateReportData } from "./type/report-card.type";
@@ -79,17 +79,47 @@ export class ReportCardService {
         }
     }
 
-    async getReportCard(rid: number) {
+    async getReportCard(class_id: number) {
         try {
-            return await this.reportCardRepository.findOne({
-                where: {
-                    id: rid
-                },
-                relations: ["student"],
+            // Step 1: Get all students belonging to this class
+            const students = await this.studentRepository.find({
+                where: { class_rate: { class_id } },
+                relations: ['class_rate'],
             });
-        } catch (error) {
-            console.error("Error get report card:", error);
-            throw error;
+
+            if (!students.length) {
+                throw new Error('No students found for this class.');
+            }
+
+            // Step 2: Extract student IDs
+            const studentIds = students.map((student) => student.student_id);
+
+            // Debug logs (optional)
+            console.log('Student IDs:', studentIds);
+
+            // Step 3: Find report cards for all those students
+            const reportCards = await this.reportCardRepository.find({
+                where: {
+                    student: {
+                        student_id: In(studentIds),
+                    },
+                },
+                relations: ['student'], // include student info
+            });
+
+            if (!reportCards.length) {
+                throw new Error('No report cards found for these students.');
+            }
+
+            // Step 4: Return a structured response
+            return reportCards;
+        } catch (error: any) {
+            console.error('Error get report card:', error);
+            return {
+                status: false,
+                message: 'Something went wrong',
+                error: error.message || error,
+            };
         }
     }
     async deleteReportCard(card_id: number) {
