@@ -78,11 +78,10 @@ export class ReportCardService {
             throw error;
         }
     }
-
     async getReportCard(class_id: number) {
         try {
-            // Step 1: Get all students belonging to this class
-            const students = await this.studentRepository.find({
+            // Step 1: Get all students belonging to the class
+            const students: any = await this.studentRepository.find({
                 where: { class_rate: { class_id } },
                 relations: ['class_rate'],
             });
@@ -94,15 +93,10 @@ export class ReportCardService {
             // Step 2: Extract student IDs
             const studentIds = students.map((student) => student.student_id);
 
-            // Debug logs (optional)
-            console.log('Student IDs:', studentIds);
-
-            // Step 3: Find report cards for all those students
+            // Step 3: Find report cards for those students
             const reportCards = await this.reportCardRepository.find({
                 where: {
-                    student: {
-                        student_id: In(studentIds),
-                    },
+                    student: { student_id: In(studentIds) },
                 },
                 relations: ['student'], // include student info
             });
@@ -111,14 +105,36 @@ export class ReportCardService {
                 throw new Error('No report cards found for these students.');
             }
 
-            // Step 4: Return a structured response
-            return reportCards;
-        } catch (error: any) {
+            // Step 4: Flatten the response
+            const formattedData = reportCards.map((report) => ({
+                id: report.id,
+                student_id: report.student!.student_id,
+                name: report.student!.name,
+                phone: report.student!.phone,
+                address: report.student!.address,
+                section: report.student!.section,
+                status: report.student!.status,
+                month: report.month,
+                year: report.year,
+                myanmar: report.myanmar,
+                english: report.english,
+                mathematics: report.mathematics,
+                chemistry: report.chemistry,
+                physics: report.physics,
+                bio: report.bio,
+                eco: report.eco,
+                total: report.total,
+                created_at: report.created_at,
+                updated_at: report.updated_at,
+            }));
+
+            return formattedData;
+        } catch (error:any) {
             console.error('Error get report card:', error);
             return {
                 status: false,
                 message: 'Something went wrong',
-                error: error.message || error,
+                error: error.message,
             };
         }
     }
