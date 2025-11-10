@@ -93,12 +93,19 @@ export class ReportCardController {
             const { id } = req.query as { id?: string };
 
             const data = await this.reportCardService.deleteReportCard(Number(id));
-            if (data) {
-                return res.status(http_status.Success).json({
-                    status: true,
-                    message: "Report Card Deletion Successfully",
+            // console.log("delete:",data);
+            if (data.affected === 0) {
+                return res.status(http_status.BadRequest).json({
+                    status: false,
+                    message: "Report Card Deletion Not Successful",
                 })
             }
+
+            return res.status(http_status.Success).json({
+                status: true,
+                message: "Report Card Deletion Successfully",
+            })
+
         } catch (error) {
             console.error("Error delete report card:", error);
             return res.status(http_status.InternalServerError).json({

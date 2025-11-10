@@ -77,7 +77,7 @@ export class ReportCardService {
                 where: { class_rate: { class_id: Number(class_id) } },
                 relations: ['class_rate'],
             });
-
+            console.log("student :", students);
             if (!students.length) {
                 throw new Error('No students found for this class.');
             }
@@ -90,7 +90,7 @@ export class ReportCardService {
                 where: { student: { student_id: In(studentIds) } },
                 relations: ['student'],
             });
-
+            console.log("report card:", reportCards);
             if (!reportCards.length) {
                 throw new Error('No report cards found for these students.');
             }
@@ -117,7 +117,7 @@ export class ReportCardService {
                 created_at: r.created_at,
                 updated_at: r.updated_at,
             }));
-console.log("data:",flattened);
+            console.log("data:",);
             return flattened;
 
         } catch (error) {

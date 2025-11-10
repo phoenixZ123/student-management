@@ -20,7 +20,6 @@ export class Student {
     name!: string;
 
     @ManyToOne(() => ClassRate, (classRate) => classRate.students, {
-        onDelete: "SET NULL",
         nullable: true,
     })
     class_rate!: ClassRate | null;

@@ -17,8 +17,8 @@ export class ReportCard {
   })
 
   @ManyToOne(() => Student, (student) => student.reportCards, {
-    onDelete: "CASCADE",   // if student is deleted, report cards will be deleted
-    nullable: false,       // report card must have a student
+    nullable: false,
+    onDelete: "CASCADE",       // report card must have a student
   })
   @JoinColumn({ name: "student_id" }) // foreign key column
   student!: Student;
