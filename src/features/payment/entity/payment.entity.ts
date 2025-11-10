@@ -18,22 +18,22 @@ export class Payment {
   })
   student?: Student;
 
-  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  @Column("float", { default: 0 })
   amount!: number;
 
   @Column("varchar", { length: 50, default: "cash" })
   payment_type!: string;
 
-  @CreateDateColumn({
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP",
+   @Column({
+    type: 'timestamptz', // timezone-aware
+    default: () => "CURRENT_TIMESTAMP"
   })
   created_at!: Date;
 
-  @UpdateDateColumn({
-    type: "timestamp",
+  @Column({
+    type: 'timestamptz',
     default: () => "CURRENT_TIMESTAMP",
-    onUpdate: "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP"
   })
   updated_at!: Date;
 }

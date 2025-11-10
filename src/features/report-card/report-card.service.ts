@@ -79,11 +79,11 @@ export class ReportCardService {
         }
     }
 
-    async getReportCard(student_id: number) {
+    async getReportCard(rid: number) {
         try {
             return await this.reportCardRepository.findOne({
                 where: {
-                    student: { student_id: student_id }
+                    id: rid
                 },
                 relations: ["student"],
             });
