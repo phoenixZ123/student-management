@@ -128,7 +128,7 @@ export class PaymentService implements IPaymentInterface {
             });
 
             if (!payments.length) {
-                throw new Error("Student has no payments yet");
+               return [];
             }
 
             const data = payments.map(payment => {

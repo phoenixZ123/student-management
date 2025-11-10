@@ -69,7 +69,7 @@ export class ReportCardService {
                 where: { class_rate: { class_id: Number(class_id) } },
                 relations: ['class_rate'],
             });
-            console.log("student :", students);
+            // console.log("student :", students);
             if (!students.length) {
                 return false;
             }
@@ -110,7 +110,6 @@ export class ReportCardService {
                 updated_at: r.updated_at,
                 date: `${r.created_at.getFullYear()}-${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(r.created_at)}-${r.created_at.getDate().toString().padStart(2, '0')}`
             }));
-            console.log("data:",);
             return flattened;
 
         } catch (error) {

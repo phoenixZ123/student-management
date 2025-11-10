@@ -61,9 +61,16 @@ export class PaymentController {
         try {
             const { id } = req.query as { id?: string };
             const data = await this.paymentService.getStudentPayment(Number(id));
+            if (data.length == 0) {
+                return res.status(http_status.Success).json({
+                    status: true,
+                    message: "Empty student payment",
+                    data
+                })
+            }
             return res.status(http_status.Success).json({
-                status:true,
-                message:"Student Payment",
+                status: true,
+                message: "Student Payment",
                 data
             })
         } catch (error) {
