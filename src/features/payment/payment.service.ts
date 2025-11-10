@@ -124,6 +124,7 @@ export class PaymentService implements IPaymentInterface {
             const payments: any[] = await this.paymentRepository.find({
                 where: { student: { student_id: id } },
                 order: { payment_date: "DESC" }, // latest first
+                relations:["student"]
             });
 
             if (!payments.length) {
@@ -137,11 +138,12 @@ export class PaymentService implements IPaymentInterface {
                     : null;
 
                 return {
+                    student_name:payment.student.name,
                     amount: payment.amount,
                     note: payment.note,
                     credit_amount: payment.credit_amount,
                     payment_type: payment.payment_type,
-                    date: formattedDate,
+                    payment_date: formattedDate,
                 };
             });
 
