@@ -4,8 +4,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
 } from "typeorm";
 
 @Entity("payment")
@@ -21,11 +19,24 @@ export class Payment {
   @Column("float", { default: 0 })
   amount!: number;
 
+  @Column("varchar", { length: 155, nullable: true })
+  note?: string;  // lowercase and varchar is fine
+
+  @Column("float", { default: null })
+  credit_amount!: number; // use float or numeric, NOT "number"
+
   @Column("varchar", { length: 50, default: "cash" })
   payment_type!: string;
 
-   @Column({
-    type: 'timestamptz', // timezone-aware
+  @Column({
+    type: "timestamptz",
+    nullable: true,   // allows null values
+    default: null
+  })
+  payment_date?: Date;
+
+  @Column({
+    type: 'timestamptz', 
     default: () => "CURRENT_TIMESTAMP"
   })
   created_at!: Date;

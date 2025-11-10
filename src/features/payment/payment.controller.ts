@@ -4,7 +4,7 @@ import { paymentDto } from "./dtos/payment.dto";
 import { PaymentService } from "./payment.service";
 
 export class PaymentController {
-    constructor(private readonly paymentService: PaymentService) {}
+    constructor(private readonly paymentService: PaymentService) { }
 
     async create(req: Request, res: Response) {
         try {
@@ -24,9 +24,10 @@ export class PaymentController {
             if (!data) {
                 return res.status(http_status.BadRequest).json({
                     status: false,
-                    message: "Cannot Create Payment",
+                    message: "Payment cannot create",
                 });
             }
+           
 
             return res.status(http_status.Success).json({
                 status: true,

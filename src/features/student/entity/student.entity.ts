@@ -19,10 +19,11 @@ export class Student {
     @Column("varchar", { length: 100 })
     name!: string;
 
-    @ManyToOne(() => ClassRate, (classRate) => classRate.students, {
-        nullable: true,
-    })
-    class_rate!: ClassRate | null;
+   @ManyToOne(() => ClassRate, (classRate) => classRate.students, {
+    nullable: true,
+    onDelete: "SET NULL", // Important: deleting a class sets students.class_rate to null
+})
+class_rate!: ClassRate | null;
 
     @Column("varchar", { length: 15 })
     phone!: string;

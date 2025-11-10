@@ -79,7 +79,7 @@ export class ReportCardService {
             });
             console.log("student :", students);
             if (!students.length) {
-                throw new Error('No students found for this class.');
+                return false;
             }
 
             // Step 2: Extract student IDs
@@ -92,7 +92,7 @@ export class ReportCardService {
             });
             console.log("report card:", reportCards);
             if (!reportCards.length) {
-                throw new Error('No report cards found for these students.');
+                return false;
             }
 
             // Step 4: Flatten report card data (no nested student object)
