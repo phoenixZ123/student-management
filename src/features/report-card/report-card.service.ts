@@ -116,6 +116,8 @@ export class ReportCardService {
                 total: r.total,
                 created_at: r.created_at,
                 updated_at: r.updated_at,
+                date: `${r.created_at.getFullYear()}-${(r.created_at.getMonth() + 1)
+                    .toString().padStart(2, '0')}-${r.created_at.getDate().toString().padStart(2, '0')}`
             }));
             console.log("data:",);
             return flattened;
