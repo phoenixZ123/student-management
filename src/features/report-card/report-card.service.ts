@@ -29,7 +29,7 @@ export class ReportCardService {
 
             // Find the student
             const student = await this.studentRepository.findOne({
-                where: { student_id: Number(data.student_id) }
+                where: { student_id: Number(data.student_id) },
             });
             if (!student) {
                 throw new Error("Student not found");
@@ -45,26 +45,17 @@ export class ReportCardService {
                 (data.bio ?? 0) +
                 (data.eco ?? 0);
 
-            // --- Convert marks to grades safely ---
-            const myanmarGrade = getGrade(data.myanmar ?? 0);
-            const englishGrade = getGrade(data.english ?? 0);
-            const mathGrade = getGrade(data.math ?? 0);
-            const chemistryGrade = getGrade(data.chemistry ?? 0);
-            const physicsGrade = getGrade(data.physics ?? 0);
-            const bioGrade = getGrade(data.bio ?? 0);
-            const ecoGrade = getGrade(data.eco ?? 0);
-
             // --- Create report card entity ---
             const reportCard = this.reportCardRepository.create({
                 month: data.month,
                 year: data.year,
-                myanmar: myanmarGrade,
-                english: englishGrade,
-                mathematics: mathGrade,
-                chemistry: chemistryGrade,
-                physics: physicsGrade,
-                bio: bioGrade,
-                eco: ecoGrade,
+                myanmar: data.myanmar ?? 0,
+                english: data.english ?? 0,
+                mathematics: data.math ?? 0,
+                chemistry: data.chemistry ?? 0,
+                physics: data.physics ?? 0,
+                bio: data.bio ?? 0,
+                eco: data.eco ?? 0,
                 total: total,
                 student: student
             });
@@ -78,11 +69,12 @@ export class ReportCardService {
             throw error;
         }
     }
+
     async getReportCard(class_id: number) {
         try {
-            // Step 1: Get all students belonging to the class
-            const students: any = await this.studentRepository.find({
-                where: { class_rate: { class_id } },
+            // Step 1: Fetch all students in the class
+            const students = await this.studentRepository.find({
+                where: { class_rate: { class_id: Number(class_id) } },
                 relations: ['class_rate'],
             });
 
@@ -91,53 +83,49 @@ export class ReportCardService {
             }
 
             // Step 2: Extract student IDs
-            const studentIds = students.map((student) => student.student_id);
+            const studentIds = students.map(s => s.student_id);
 
-            // Step 3: Find report cards for those students
+            // Step 3: Fetch report cards for these students
             const reportCards = await this.reportCardRepository.find({
-                where: {
-                    student: { student_id: In(studentIds) },
-                },
-                relations: ['student'], // include student info
+                where: { student: { student_id: In(studentIds) } },
+                relations: ['student'],
             });
 
             if (!reportCards.length) {
                 throw new Error('No report cards found for these students.');
             }
 
-            // Step 4: Flatten the response
-            const formattedData = reportCards.map((report) => ({
-                id: report.id,
-                student_id: report.student!.student_id,
-                name: report.student!.name,
-                phone: report.student!.phone,
-                address: report.student!.address,
-                section: report.student!.section,
-                status: report.student!.status,
-                month: report.month,
-                year: report.year,
-                myanmar: report.myanmar,
-                english: report.english,
-                mathematics: report.mathematics,
-                chemistry: report.chemistry,
-                physics: report.physics,
-                bio: report.bio,
-                eco: report.eco,
-                total: report.total,
-                created_at: report.created_at,
-                updated_at: report.updated_at,
+            // Step 4: Flatten report card data (no nested student object)
+            const flattened = reportCards.map(r => ({
+                id: r.id,
+                student_id: r.student!.student_id,
+                name: r.student!.name,
+                phone: r.student!.phone,
+                address: r.student!.address,
+                section: r.student!.section,
+                status: r.student!.status,
+                month: r.month,
+                year: r.year,
+                myanmar: r.myanmar,
+                english: r.english,
+                mathematics: r.mathematics,
+                chemistry: r.chemistry,
+                physics: r.physics,
+                bio: r.bio,
+                eco: r.eco,
+                total: r.total,
+                created_at: r.created_at,
+                updated_at: r.updated_at,
             }));
+console.log("data:",flattened);
+            return flattened;
 
-            return formattedData;
-        } catch (error:any) {
+        } catch (error) {
             console.error('Error get report card:', error);
-            return {
-                status: false,
-                message: 'Something went wrong',
-                error: error.message,
-            };
+            throw error;
         }
     }
+
     async deleteReportCard(card_id: number) {
         try {
             return await this.reportCardRepository.delete({ id: card_id });
@@ -153,36 +141,36 @@ export class ReportCardService {
             if (!report) throw new Error("Report Card not found");
 
             // --- Convert existing grades to numeric marks if data missing ---
-            const myanmarMark = data.myanmar ?? gradeToMark(report.myanmar);
-            const englishMark = data.english ?? gradeToMark(report.english);
-            const mathMark = data.mathematics ?? gradeToMark(report.mathematics);
-            const cheMark = data.chemistry ?? gradeToMark(report.chemistry);
-            const phyMark = data.physics ?? gradeToMark(report.physics);
-            const bioMark = data.bio ?? gradeToMark(report.bio);
-            const ecoMark = data.eco ?? gradeToMark(report.eco);
+            const myanmarMark = data.myanmar ?? report.myanmar;
+            const englishMark = data.english ?? report.english;
+            const mathMark = data.mathematics ?? report.mathematics;
+            const cheMark = data.chemistry ?? report.chemistry;
+            const phyMark = data.physics ?? report.physics;
+            const bioMark = data.bio ?? report.bio;
+            const ecoMark = data.eco ?? report.eco;
 
             // --- Recalculate total ---
-            const total = myanmarMark + englishMark + mathMark + cheMark + phyMark + bioMark + ecoMark;
+            const total = Number(myanmarMark) + Number(englishMark) + Number(mathMark) + Number(cheMark) + Number(phyMark) + Number(bioMark) + Number(ecoMark);
 
             // --- Convert numeric marks to grades ---
-            const myanmarGrade = getGrade(myanmarMark);
-            const englishGrade = getGrade(englishMark);
-            const mathGrade = getGrade(mathMark);
-            const cheGrade = getGrade(cheMark);
-            const phyGrade = getGrade(phyMark);
-            const bioGrade = getGrade(bioMark);
-            const ecoGrade = getGrade(ecoMark);
+            // const myanmarGrade = getGrade(myanmarMark);
+            // const englishGrade = getGrade(englishMark);
+            // const mathGrade = getGrade(mathMark);
+            // const cheGrade = getGrade(cheMark);
+            // const phyGrade = getGrade(phyMark);
+            // const bioGrade = getGrade(bioMark);
+            // const ecoGrade = getGrade(ecoMark);
 
             // --- Assign updated values ---
             report.month = data.month ?? report.month;
             report.year = data.year ?? report.year;
-            report.myanmar = myanmarGrade;
-            report.english = englishGrade;
-            report.mathematics = mathGrade;
-            report.chemistry = cheGrade;
-            report.physics = phyGrade;
-            report.bio = bioGrade;
-            report.eco = ecoGrade;
+            report.myanmar = myanmarMark;
+            report.english = englishMark;
+            report.mathematics = mathMark;
+            report.chemistry = cheMark;
+            report.physics = phyMark;
+            report.bio = bioMark;
+            report.eco = ecoMark;
             report.total = total;
 
             return await this.reportCardRepository.save(report);

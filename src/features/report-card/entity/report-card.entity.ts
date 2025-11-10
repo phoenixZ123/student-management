@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  JoinColumn
 } from "typeorm";
 
 @Entity("report_card")
@@ -14,38 +15,45 @@ export class ReportCard {
   @ManyToOne(() => Student, (student) => student.reportCards, {
     onDelete: "CASCADE",
   })
-  student?: Student;
 
-  @Column("varchar", { length: 20 })
+  @ManyToOne(() => Student, (student) => student.reportCards, {
+    onDelete: "CASCADE",   // if student is deleted, report cards will be deleted
+    nullable: false,       // report card must have a student
+  })
+  @JoinColumn({ name: "student_id" }) // foreign key column
+  student!: Student;
+
+  @Column({ type: "varchar", length: 20 })
   month!: string;
 
-  @Column("int")
+  @Column({ type: "int" })
   year!: number;
 
-  // --- Subject Grades ---
-  @Column("varchar", { length: 2, nullable: true })
-  myanmar?: string;
+  // --- Subject Grades as numbers ---
+  @Column({ type: "int", nullable: true })
+  myanmar?: number;
 
-  @Column("varchar", { length: 2, nullable: true })
-  english?: string;
+  @Column({ type: "int", nullable: true })
+  english?: number;
 
-  @Column("varchar", { length: 2, nullable: true })
-  mathematics?: string;
+  @Column({ type: "int", nullable: true })
+  mathematics?: number;
 
-  @Column("varchar", { length: 2, nullable: true })
-  chemistry?: string;
+  @Column({ type: "int", nullable: true })
+  chemistry?: number;
 
-  @Column("varchar", { length: 2, nullable: true })
-  physics?: string;
+  @Column({ type: "int", nullable: true })
+  physics?: number;
 
-  @Column("varchar", { length: 2, nullable: true })
-  bio?: string;
+  @Column({ type: "int", nullable: true })
+  bio?: number;
 
-  @Column("varchar", { length: 2, nullable: true })
-  eco?: string;
+  @Column({ type: "int", nullable: true })
+  eco?: number;
 
-  @Column("int",{default:0})
-  total?:number;
+  @Column({ type: "int", default: 0 })
+  total?: number;
+
 
   @Column({
     type: "timestamptz",
