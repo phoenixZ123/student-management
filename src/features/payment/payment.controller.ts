@@ -82,4 +82,29 @@ export class PaymentController {
             });
         }
     }
+    async updatePaymentC(req: Request, res: Response) {
+        try {
+            const { id } = req.query as { id?: string };
+            const body = req.body as paymentDto;
+            if (!body) {
+                return res.status(http_status.BadRequest).json({
+                    status: false,
+                    message: "some fields are required"
+                })
+            }
+            const data = await this.paymentService.updatePayment(Number(id), body);
+            return res.status(http_status.Success).json({
+                status:true,
+                message:"Payment Updated Successfully",
+                data
+            })
+        } catch (error) {
+            console.error("Error update payment:", error);
+            return res.status(http_status.InternalServerError).json({
+                status: false,
+                message: "Failed to update payment",
+                error: error instanceof Error ? error.message : String(error),
+            });
+        }
+    }
 }

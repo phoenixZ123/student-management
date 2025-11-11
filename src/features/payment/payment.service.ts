@@ -1,4 +1,4 @@
-import { In, Repository } from "typeorm";
+import { In, MoreThan, Not, Repository } from "typeorm";
 import { Payment } from "./entity/payment.entity";
 import { AppDataSource } from "src/config/db.config";
 import { IPaymentInterface } from "./interface/payment.interface";
@@ -108,7 +108,9 @@ export class PaymentService implements IPaymentInterface {
                 class_name: p.student?.class_rate?.className ?? "No class assigned",
                 amount: p.amount,
                 credit_amount: p.credit_amount ?? 0,
-                payment_date: p.payment_date,
+                payment_date: p.payment_date
+                    ? `${p.payment_date.getFullYear()}-${new Intl.DateTimeFormat('en-US', { month: 'short' }).format(p.payment_date)}-${p.payment_date.getDate().toString().padStart(2, '0')}`
+                    : 'N/A',
                 payment_type: p.payment_type,
                 note: p.note,
             }));
@@ -124,11 +126,11 @@ export class PaymentService implements IPaymentInterface {
             const payments: any[] = await this.paymentRepository.find({
                 where: { student: { student_id: id } },
                 order: { payment_date: "DESC" }, // latest first
-                relations:["student"]
+                relations: ["student"]
             });
 
             if (!payments.length) {
-               return [];
+                return [];
             }
 
             const data = payments.map(payment => {
@@ -138,7 +140,7 @@ export class PaymentService implements IPaymentInterface {
                     : null;
 
                 return {
-                    student_name:payment.student.name,
+                    student_name: payment.student.name,
                     amount: payment.amount,
                     note: payment.note,
                     credit_amount: payment.credit_amount,
@@ -154,6 +156,71 @@ export class PaymentService implements IPaymentInterface {
             throw error;
         }
 
+    }
+    async updatePayment(id: number, data: paymentDto) {
+        try {
+            // Fetch the payment record by ID
+            const payment = await this.paymentRepository.findOne({ where: { id } });
+            
+            if (!payment) {
+                throw new Error('Payment not found');
+            }
+
+            // Fetch the last payment for the same student
+            const lastPayment = await this.paymentRepository.findOne({
+                where: { student: { student_id: payment.student?.student_id } },
+                order: { payment_date: 'DESC' },
+            });
+
+            if (data.amount !== undefined) {
+                if (!lastPayment) {
+                    throw new Error('No previous payment found for this student');
+                }
+
+                const amount = Number(data.amount);
+                const lastCredit = Number(lastPayment.credit_amount);
+
+                if (amount > lastCredit) {
+                    throw new Error(
+                        `Amount (${amount}) cannot be greater than last credit amount (${lastCredit})`
+                    );
+                }
+
+                data.credit_amount = lastCredit - amount;
+            }
+
+            // Save current payment
+            Object.assign(payment, data);
+            await this.paymentRepository.save(payment);
+
+            // Update subsequent payments
+            const subsequentPayments = await this.paymentRepository.find({
+                where: {
+                    student: { student_id: payment.student?.student_id },
+                    payment_date: MoreThan(payment.payment_date!), // <-- Use MoreThan instead of $gt
+                },
+                order: { payment_date: 'ASC' },
+            });
+
+            let previousCredit = data.credit_amount ?? lastPayment?.credit_amount ?? 0;
+
+            for (const nextPayment of subsequentPayments) {
+                if (Number(nextPayment.amount) > previousCredit) {
+                    throw new Error(
+                        `Subsequent payment amount (${nextPayment.amount}) cannot exceed remaining credit (${previousCredit})`
+                    );
+                }
+                nextPayment.credit_amount = previousCredit - Number(nextPayment.amount);
+                previousCredit = nextPayment.credit_amount;
+                await this.paymentRepository.save(nextPayment);
+            }
+
+            return payment;
+
+        } catch (error) {
+            console.error('Error updating payment:', error);
+            throw error;
+        }
     }
 
 }

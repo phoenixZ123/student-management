@@ -9,4 +9,5 @@ const paymentController = new PaymentController(paymentService);
 router.post("/create-payment",authenticate,paymentController.create.bind(paymentController));
 router.get("/get-payment",authenticate,paymentController.getPayment.bind(paymentController));
 router.get("/get-student-details",authenticate,paymentController.getStudentPayment.bind(paymentController));
+router.put("/update-payment",paymentController.updatePaymentC.bind(paymentController));
 export default router;
