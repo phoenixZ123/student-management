@@ -161,7 +161,7 @@ export class PaymentService implements IPaymentInterface {
         try {
             // Fetch the payment record by ID
             const payment = await this.paymentRepository.findOne({ where: { id } });
-            
+
             if (!payment) {
                 throw new Error('Payment not found');
             }
@@ -222,5 +222,12 @@ export class PaymentService implements IPaymentInterface {
             throw error;
         }
     }
-
+    async deletePayment(id: number) {
+        try {
+            return await this.paymentRepository.delete({ id });
+        } catch (error) {
+            console.error('Error delete payment:', error);
+            throw error;
+        }
+    }
 }

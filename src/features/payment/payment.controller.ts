@@ -94,10 +94,34 @@ export class PaymentController {
             }
             const data = await this.paymentService.updatePayment(Number(id), body);
             return res.status(http_status.Success).json({
-                status:true,
-                message:"Payment Updated Successfully",
+                status: true,
+                message: "Payment Updated Successfully",
                 data
             })
+        } catch (error) {
+            console.error("Error update payment:", error);
+            return res.status(http_status.InternalServerError).json({
+                status: false,
+                message: "Failed to update payment",
+                error: error instanceof Error ? error.message : String(error),
+            });
+        }
+    }
+    async deletePaymentC(req: Request, res: Response) {
+        try {
+            const { id } = req.query as { id?: string };
+            const result = await this.paymentService.deletePayment(Number(id));
+            if (!result) {
+                return res.status(http_status.BadRequest).json({
+                    status: false,
+                    message: "Cannot delete to this payment"
+                })
+            }
+            return res.status(http_status.Success).json({
+                status: true,
+                message: "Payment Deleted Successfully"
+            });
+            
         } catch (error) {
             console.error("Error update payment:", error);
             return res.status(http_status.InternalServerError).json({
